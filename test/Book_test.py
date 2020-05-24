@@ -1,12 +1,13 @@
-book1 = Book("kavuşamayanlar", "simay seyrek", "2020", "dram", "90")
+from Book import Book
+book1 = Book("kavuşamayanlar", "simay seyrek", "2020", "dram", 90)
 print(book1.publish_year)
 print(book1.author)
 print(book1.name)
 print(book1.category)
 print(book1.page_number)
 print(book1)
-print(book1.str)
-print(book1.repr())
+#print(book1.str)
+#print(book1.repr())
 
 book2 = Book("kavuşamayanlar2", "ayt", "2050", "komed", "50")
 print(book2)
