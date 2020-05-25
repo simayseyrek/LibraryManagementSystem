@@ -1,15 +1,10 @@
+import sys
+sys.path.append('..')
 from Book import Book
-book1 = Book("kavuşamayanlar", "simay seyrek", "2020", "dram", 90)
-print(book1.publish_year)
-print(book1.author)
-print(book1.name)
-print(book1.category)
-print(book1.page_number)
-print(book1)
-#print(book1.str)
-#print(book1.repr())
 
-book2 = Book("kavuşamayanlar2", "ayt", "2050", "komed", "50")
+
+book1 = Book(123345, "kavuşamayanlar", "simay seyrek", 2020, "dram", 90)
+print(book1)
+
+book2 = Book(5135566, "kavuşamayanlar2", "ayt", 2050, "komed", 50)
 print(book2)
-my_srting = "sum of {} and {} is {}".format(6, 5, 'c')
-print (my_srting)
