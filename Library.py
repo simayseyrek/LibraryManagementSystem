@@ -9,7 +9,7 @@ class Library:
             user="root",
             passwd="bunebe01"
         )
-        self.db_name = "Library1"
+        self.db_name = "Library123"
         self.cursor = self.mydb.cursor()
 
         # create db if not exists
@@ -22,13 +22,13 @@ class Library:
         # create books table
         self.cursor.execute("CREATE TABLE IF NOT EXISTS books (isbn INT PRIMARY KEY, title VARCHAR(255), author VARCHAR(255), publish_year INT, category VARCHAR(255), page_number INT, total_number INT, available_number INT)")
         # create settings table
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS settings (number INT PRIMARY KEY, student_book_limit INT, student_book_time INT)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS settings (number INT PRIMARY KEY AUTO_INCREMENT, student_book_limit INT, student_book_time INT)")
         # create checkouts table
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS checkouts (number INT PRIMARY KEY, id INT, isbn INT, date VARCHAR(255))")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS checkouts (number INT PRIMARY KEY AUTO_INCREMENT, id INT, isbn INT, date VARCHAR(255))")
         # create checkin_approvals table
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS checkin_approvals (number INT PRIMARY KEY, id INT, isbn INT)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS checkin_approvals (number INT PRIMARY KEY AUTO_INCREMENT, id INT, isbn INT)")
         # create teacher_approvals table
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS teacher_approvals (number INT PRIMARY KEY, id INT)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS teacher_approvals (number INT PRIMARY KEY AUTO_INCREMENT, id INT)")
 
     def add_book(self, isbn, title, author, publish_year, category, page_number):
         try:
@@ -51,12 +51,6 @@ class Library:
         except:
             return False
         return True
-           
-    def get_all_books(self):
-        # show all books from database
-        self.cursor.execute("SELECT * FROM books")
-
-        return self.cursor.fetchall()
 
     def add_user(self, id, name, email, password, level):
         try:
@@ -68,15 +62,53 @@ class Library:
             return False
         return True
 
+    def add_teacher_approval(self, id):
+        try:
+            sql = "INSERT INTO teacher_approvals (number, id) VALUES (DEFAULT, {})".format(id)
+            self.cursor.execute(sql)
+            self.mydb.commit()
+        except:
+            return False
+        return True
+
+    def get_teacher_approval(self):
+        self.cursor.execute("SELECT * FROM teacher_approvals")
+        return self.cursor.fetchall()
+
+    def approve_teacher_approval(self, id):
+        try:
+            sql = "UPDATE users SET level = 2 WHERE id = {}".format(id)
+            self.cursor.execute(sql)
+            self.mydb.commit()
+            sql = "DELETE FROM teacher_approvals WHERE id = {}".format(id)
+            self.cursor.execute(sql)
+            self.mydb.commit()
+        except:
+            return False
+        return True
+
+    def reject_teacher_approval(self, id):
+        try:
+            sql = "DELETE FROM teacher_approvals WHERE id = {}".format(id)
+            self.cursor.execute(sql)
+            self.mydb.commit()
+        except:
+            return False
+        return True
+
+
+    def get_all_books(self):
+        # show all books from database
+        self.cursor.execute("SELECT * FROM books")
+
+        return self.cursor.fetchall()
+
     def get_all_users(self):
         # show all users from database
         self.cursor.execute("SELECT * FROM users")
 
         return self.cursor.fetchall()
 
-    def is_exist_book(self,book):
+    def is_exist_book(self, book):
         # ....
         pass
-
-    
-
