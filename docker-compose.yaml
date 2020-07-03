@@ -1,0 +1,23 @@
+version: "3"
+
+
+services:
+  mysql-server:
+    image: mysql/mysql-server:latest
+    restart: always
+    volumes:
+      - ./mysqldata:/var/lib/mysql:rw,delegated
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=bunebe01
+      - MYSQL_ROOT_HOST=%
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    environment:
+      PMA_HOST: mysql-server
+      PMA_PORT: 3306
+    ports:
+      - "8080:80"

@@ -1,0 +1,82 @@
+import mysql.connector
+
+
+class Library:
+    def __init__(self):
+      # connect to database
+        self.mydb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            passwd="bunebe01"
+        )
+        self.db_name = "Library1"
+        self.cursor = self.mydb.cursor()
+
+        # create db if not exists
+        self.cursor.execute("CREATE DATABASE IF NOT EXISTS " + self.db_name) 
+        # using library db
+        self.cursor.execute('use ' + self.db_name)
+        
+        # create users table
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS users (id INT PRIMARY KEY, name VARCHAR(255), email VARCHAR(255), password VARCHAR(255), level INT)")
+        # create books table
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS books (isbn INT PRIMARY KEY, title VARCHAR(255), author VARCHAR(255), publish_year INT, category VARCHAR(255), page_number INT, total_number INT, available_number INT)")
+        # create settings table
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS settings (number INT PRIMARY KEY, student_book_limit INT, student_book_time INT)")
+        # create checkouts table
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS checkouts (number INT PRIMARY KEY, id INT, isbn INT, date VARCHAR(255))")
+        # create checkin_approvals table
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS checkin_approvals (number INT PRIMARY KEY, id INT, isbn INT)")
+        # create teacher_approvals table
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS teacher_approvals (number INT PRIMARY KEY, id INT)")
+
+    def add_book(self, isbn, title, author, publish_year, category, page_number):
+        try:
+            sql = "SELECT * FROM books WHERE isbn = {}".format(isbn)
+            self.cursor.execute(sql)
+            books = self.cursor.fetchall()
+            if len(books) == 0:
+                total_number = 1
+                available_number = 1
+                sql = "INSERT INTO books (isbn, title, author, publish_year, category, page_number, total_number, available_number) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                val = (isbn, title, author, publish_year, category, page_number, total_number, available_number)
+                self.cursor.execute(sql, val)
+                self.mydb.commit()
+            else:
+                total_number = books[0][6] + 1
+                available_number = books[0][7] + 1
+                sql = "UPDATE books SET total_number = {}, available_number = {} WHERE isbn = {}".format(total_number, available_number, isbn)
+                self.cursor.execute(sql)
+                self.mydb.commit()
+        except:
+            return False
+        return True
+           
+    def get_all_books(self):
+        # show all books from database
+        self.cursor.execute("SELECT * FROM books")
+
+        return self.cursor.fetchall()
+
+    def add_user(self, id, name, email, password, level):
+        try:
+            sql = "INSERT INTO users (id, name, email, password, level) VALUES (%s, %s, %s, %s, %s)"
+            val = (id, name, email, password, level)
+            self.cursor.execute(sql, val)
+            self.mydb.commit()
+        except:
+            return False
+        return True
+
+    def get_all_users(self):
+        # show all users from database
+        self.cursor.execute("SELECT * FROM users")
+
+        return self.cursor.fetchall()
+
+    def is_exist_book(self,book):
+        # ....
+        pass
+
+    
+
