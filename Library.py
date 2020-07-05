@@ -1,5 +1,6 @@
 import mysql.connector
 import hashlib
+import time
 
 
 class Library:
@@ -171,11 +172,64 @@ class Library:
         self.cursor.execute("UPDATE settings SET student_book_time = {} WHERE number = 1".format(student_book_time))
         self.mydb.commit()
 
-    def get_all_books(self):
-        # show all books from database
-        self.cursor.execute("SELECT * FROM books")
+    def set_student_book_time(self, student_book_time):
+        self.cursor.execute("UPDATE settings SET student_book_time = {} WHERE number = 1".format(student_book_time))
+        self.mydb.commit()
 
+    def show_my_book(self, id):
+        sql = "SELECT * FROM checkouts WHERE id = '{}'".format(id)
+        self.cursor.execute(sql)
         return self.cursor.fetchall()
+
+    def check_if_student(self, id):
+        # check if user is student or teacher
+        sql = "SELECT * FROM users WHERE id = '{}'".format(id)
+        self.cursor.execute(sql)
+        user_level = self.cursor.fetchall()[0][4]
+
+        # check if student has a limit
+        if user_level == 1:
+            return True
+        return False
+
+    def checkout_book(self, id, isbn):
+        # check if book is available
+        sql = "SELECT * FROM books WHERE isbn = '{}'".format(isbn)
+        self.cursor.execute(sql)
+        available_number = self.cursor.fetchall()[0][7]
+        if available_number == 0:
+            return False
+
+        if self.check_if_student(id) is True:
+            if self.get_student_book_limit() <= len(self.show_my_book(id)):
+                return False
+
+        # Checkout book
+        self.cursor.execute("UPDATE books SET available_number = {} WHERE isbn = {}".format(available_number - 1, isbn))
+        self.mydb.commit()
+
+        date = str(time.time())
+        sql = "INSERT INTO checkouts VALUES (DEFAULT, {}, {}, {})".format(id, isbn, date)
+        self.cursor.execute(sql)
+        self.mydb.commit()
+        return True
+
+    def book_time_notification(self, id):
+        # check if user is student or teacher
+        if self.check_if_student(id) is False:
+            return []
+
+        sql = "SELECT * FROM checkouts WHERE id = '{}'".format(id)
+        self.cursor.execute(sql)
+        checkouts = self.cursor.fetchall()
+
+        notify_books = []
+        student_book_time_seconds = self.get_student_book_time() * 60
+        for checkout in checkouts:
+            time_difference_seconds = time.time() - float(checkout[3])
+            if time_difference_seconds > student_book_time_seconds:
+                notify_books.append(checkout)
+        return notify_books
 
     def get_all_users(self):
         # show all users from database
