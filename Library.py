@@ -1,4 +1,5 @@
 import mysql.connector
+import hashlib
 
 
 class Library:
@@ -9,7 +10,7 @@ class Library:
             user="root",
             passwd="bunebe01"
         )
-        self.db_name = "Library123"
+        self.db_name = "Library1234"
         self.cursor = self.mydb.cursor()
 
         # create db if not exists
@@ -53,9 +54,10 @@ class Library:
         return True
 
     def add_user(self, id, name, email, password, level):
+        hash_password = self.hash_password(password)
         try:
             sql = "INSERT INTO users (id, name, email, password, level) VALUES (%s, %s, %s, %s, %s)"
-            val = (id, name, email, password, level)
+            val = (id, name, email, hash_password, level)
             self.cursor.execute(sql, val)
             self.mydb.commit()
         except:
@@ -96,7 +98,35 @@ class Library:
             return False
         return True
 
+    @staticmethod
+    def hash_password(password):
+        encoded_password = password.encode('utf-8')
+        hash = hashlib.sha256(encoded_password)
+        return hash.hexdigest()
 
+    def login(self, input, password):
+        # check if input is id or email
+        if input.isnumeric():
+            sql = "SELECT * FROM users WHERE id = {}".format(input)
+            self.cursor.execute(sql)
+            user = self.cursor.fetchall()
+            if len(user) == 0:
+                return False
+        else:
+            sql = "SELECT * FROM users WHERE email = '{}'".format(input)
+            self.cursor.execute(sql)
+            user = self.cursor.fetchall()
+            if len(user) == 0:
+                return False
+
+        # check password
+        actual_password = user[0][3]
+        verify_password = self.hash_password(password)
+        if actual_password == verify_password:
+            return True
+        return False
+
+    def search_book(self, ):
     def get_all_books(self):
         # show all books from database
         self.cursor.execute("SELECT * FROM books")
