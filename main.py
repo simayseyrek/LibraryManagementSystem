@@ -50,3 +50,23 @@ if __name__ == "__main__":
     # print(lib.show_my_book(195050002))
     # print(lib.checkout_book(195050002, 1048082))
     # print(lib.book_time_notification(195050002))
+
+    # print(lib.show_my_books(195050001))
+    # print(lib.show_my_books(195050002))
+    # print(lib.add_checkin_book_approval(195050001, 7154615))
+    # print(lib.add_checkin_book_approval(195050002, 7154615))
+    # print(lib.add_checkin_book_approval(195050001, 1049879))
+    # print(lib.show_my_books(195050001))
+    # print(lib.show_my_books(195050002))
+    # print(lib.search_book(isbn='7154615'))
+    #
+    # print(lib.get_checkin_book_approvals())
+    # print(lib.reject_checkin_book_approval(195050001, 1049879))
+    # print(lib.get_checkin_book_approvals())
+    #
+    # print(lib.approve_checkin_approval(195050001, 7154615))
+    # print(lib.approve_checkin_approval(195050002, 7154615))
+    # print(lib.get_checkin_book_approvals())
+    # print(lib.show_my_books(195050001))
+    # print(lib.show_my_books(195050002))
+    # print(lib.search_book(isbn='7154615'))

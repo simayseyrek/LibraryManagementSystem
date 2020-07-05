@@ -68,40 +68,6 @@ class Library:
             return False
         return True
 
-    def add_teacher_approval(self, id):
-        try:
-            sql = "INSERT INTO teacher_approvals (number, id) VALUES (DEFAULT, {})".format(id)
-            self.cursor.execute(sql)
-            self.mydb.commit()
-        except:
-            return False
-        return True
-
-    def get_teacher_approval(self):
-        self.cursor.execute("SELECT * FROM teacher_approvals")
-        return self.cursor.fetchall()
-
-    def approve_teacher_approval(self, id):
-        try:
-            sql = "UPDATE users SET level = 2 WHERE id = {}".format(id)
-            self.cursor.execute(sql)
-            self.mydb.commit()
-            sql = "DELETE FROM teacher_approvals WHERE id = {}".format(id)
-            self.cursor.execute(sql)
-            self.mydb.commit()
-        except:
-            return False
-        return True
-
-    def reject_teacher_approval(self, id):
-        try:
-            sql = "DELETE FROM teacher_approvals WHERE id = {}".format(id)
-            self.cursor.execute(sql)
-            self.mydb.commit()
-        except:
-            return False
-        return True
-
     @staticmethod
     def hash_password(password):
         encoded_password = password.encode('utf-8')
@@ -176,7 +142,7 @@ class Library:
         self.cursor.execute("UPDATE settings SET student_book_time = {} WHERE number = 1".format(student_book_time))
         self.mydb.commit()
 
-    def show_my_book(self, id):
+    def show_my_books(self, id):
         sql = "SELECT * FROM checkouts WHERE id = '{}'".format(id)
         self.cursor.execute(sql)
         return self.cursor.fetchall()
@@ -192,16 +158,18 @@ class Library:
             return True
         return False
 
-    def checkout_book(self, id, isbn):
-        # check if book is available
+    def book_available_number(self, isbn):
+        # return number of available number if book is available
         sql = "SELECT * FROM books WHERE isbn = '{}'".format(isbn)
         self.cursor.execute(sql)
-        available_number = self.cursor.fetchall()[0][7]
-        if available_number == 0:
+        return self.cursor.fetchall()[0][7]
+
+    def checkout_book(self, id, isbn):
+        if self.book_available_number(isbn) == 0:
             return False
 
         if self.check_if_student(id) is True:
-            if self.get_student_book_limit() <= len(self.show_my_book(id)):
+            if self.get_student_book_limit() <= len(self.show_my_books(id)):
                 return False
 
         # Checkout book
@@ -231,12 +199,88 @@ class Library:
                 notify_books.append(checkout)
         return notify_books
 
-    def get_all_users(self):
-        # show all users from database
-        self.cursor.execute("SELECT * FROM users")
-
+    def get_all_checkouts(self):
+        # show all checkouts from database (only used by admin)
+        self.cursor.execute("SELECT * FROM checkouts")
         return self.cursor.fetchall()
 
-    def is_exist_book(self, book):
-        # ....
-        pass
+    def add_teacher_approval(self, id):
+        try:
+            sql = "INSERT INTO teacher_approvals (number, id) VALUES (DEFAULT, {})".format(id)
+            self.cursor.execute(sql)
+            self.mydb.commit()
+        except:
+            return False
+        return True
+
+    def get_teacher_approvals(self):
+        # (only used by admin)
+        self.cursor.execute("SELECT * FROM teacher_approvals")
+        return self.cursor.fetchall()
+
+    def approve_teacher_approval(self, id):
+        # (only used by admin)
+        try:
+            sql = "UPDATE users SET level = 2 WHERE id = {}".format(id)
+            self.cursor.execute(sql)
+            self.mydb.commit()
+            sql = "DELETE FROM teacher_approvals WHERE id = {}".format(id)
+            self.cursor.execute(sql)
+            self.mydb.commit()
+        except:
+            return False
+        return True
+
+    def reject_teacher_approval(self, id):
+        # (only used by admin)
+        try:
+            sql = "DELETE FROM teacher_approvals WHERE id = {}".format(id)
+            self.cursor.execute(sql)
+            self.mydb.commit()
+        except:
+            return False
+        return True
+
+    def add_checkin_book_approval(self, id, isbn):
+        # request for a Checkin book
+        try:
+            sql = "INSERT INTO checkin_approvals (number, id, isbn) VALUES (DEFAULT, {}, {})".format(id, isbn)
+            self.cursor.execute(sql)
+            self.mydb.commit()
+        except:
+            return False
+        return True
+
+    def get_checkin_book_approvals(self):
+        # (only used by admin)
+        self.cursor.execute("SELECT * FROM checkin_approvals")
+        return self.cursor.fetchall()
+
+    def approve_checkin_approval(self, id, isbn):
+        # (only used by admin)
+        try:
+            # increase available number
+            available_number = self.book_available_number(isbn)
+            self.cursor.execute("UPDATE books SET available_number = {} WHERE isbn = {}".format(available_number + 1, isbn))
+            self.mydb.commit()
+            # delete book+id from checkouts
+            sql = "DELETE FROM checkouts WHERE id = {} AND isbn = {}".format(id, isbn)
+            self.cursor.execute(sql)
+            self.mydb.commit()
+            # delete book+id from checkin approvals
+            sql = "DELETE FROM checkin_approvals WHERE id = {} AND isbn = {}".format(id, isbn)
+            self.cursor.execute(sql)
+            self.mydb.commit()
+        except:
+            return False
+        return True
+
+    def reject_checkin_book_approval(self, id, isbn):
+        # (only used by admin)
+        try:
+            sql = "DELETE FROM checkin_approvals WHERE id = {} AND isbn = {}".format(id, isbn)
+            self.cursor.execute(sql)
+            self.mydb.commit()
+        except:
+            return False
+        return True
