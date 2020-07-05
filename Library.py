@@ -10,7 +10,7 @@ class Library:
             user="root",
             passwd="bunebe01"
         )
-        self.db_name = "Library1234"
+        self.db_name = "Library6"
         self.cursor = self.mydb.cursor()
 
         # create db if not exists
@@ -22,14 +22,17 @@ class Library:
         self.cursor.execute("CREATE TABLE IF NOT EXISTS users (id INT PRIMARY KEY, name VARCHAR(255), email VARCHAR(255), password VARCHAR(255), level INT)")
         # create books table
         self.cursor.execute("CREATE TABLE IF NOT EXISTS books (isbn INT PRIMARY KEY, title VARCHAR(255), author VARCHAR(255), publish_year INT, category VARCHAR(255), page_number INT, total_number INT, available_number INT)")
-        # create settings table
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS settings (number INT PRIMARY KEY AUTO_INCREMENT, student_book_limit INT, student_book_time INT)")
         # create checkouts table
         self.cursor.execute("CREATE TABLE IF NOT EXISTS checkouts (number INT PRIMARY KEY AUTO_INCREMENT, id INT, isbn INT, date VARCHAR(255))")
         # create checkin_approvals table
         self.cursor.execute("CREATE TABLE IF NOT EXISTS checkin_approvals (number INT PRIMARY KEY AUTO_INCREMENT, id INT, isbn INT)")
         # create teacher_approvals table
         self.cursor.execute("CREATE TABLE IF NOT EXISTS teacher_approvals (number INT PRIMARY KEY AUTO_INCREMENT, id INT)")
+        # create settings table and insert default values
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS settings (number INT PRIMARY KEY AUTO_INCREMENT, student_book_limit INT, student_book_time INT)")
+        sql = "INSERT IGNORE INTO settings VALUES (1, 2, 7)".format(id)
+        self.cursor.execute(sql)
+        self.mydb.commit()
 
     def add_book(self, isbn, title, author, publish_year, category, page_number):
         try:
@@ -126,7 +129,48 @@ class Library:
             return True
         return False
 
-    def search_book(self, ):
+    def search_book(self, isbn=None, title=None, author=None, category=None, show_only_available=True):
+        if isbn is not None:
+            sql = "SELECT * FROM books WHERE isbn LIKE '%{}%'".format(isbn)
+        elif title is not None and author is not None and category is not None:
+            sql = "SELECT * FROM books WHERE title LIKE '%{}%' AND author LIKE '%{}%' AND category LIKE '%{}%'".format(title, author, category)
+        elif title is not None and author is not None:
+            sql = "SELECT * FROM books WHERE title LIKE '%{}%' AND author LIKE '%{}%'".format(title, author)
+        elif title is not None and category is not None:
+            sql = "SELECT * FROM books WHERE title LIKE '%{}%' AND category LIKE '%{}%'".format(title, category)
+        elif author is not None and category is not None:
+            sql = "SELECT * FROM books WHERE author LIKE '%{}%' AND category LIKE '%{}%'".format(author, category)
+        elif title is not None:
+            sql = "SELECT * FROM books WHERE title LIKE '%{}%'".format(title)
+        elif author is not None:
+            sql = "SELECT * FROM books WHERE author LIKE '%{}%'".format(author)
+        elif category is not None:
+            sql = "SELECT * FROM books WHERE category LIKE '%{}%'".format(category)
+        self.cursor.execute(sql)
+        books = self.cursor.fetchall()
+
+        if show_only_available is False:
+            for book in books[:]:
+                if book[7] == 0:
+                    books.remove(book)
+        return books
+
+    def get_student_book_limit(self):
+        self.cursor.execute("SELECT * FROM settings")
+        return self.cursor.fetchall()[0][1]
+
+    def get_student_book_time(self):
+        self.cursor.execute("SELECT * FROM settings")
+        return self.cursor.fetchall()[0][2]
+
+    def set_student_book_limit(self, student_book_limit):
+        self.cursor.execute("UPDATE settings SET student_book_limit = {} WHERE number = 1".format(student_book_limit))
+        self.mydb.commit()
+
+    def set_student_book_time(self, student_book_time):
+        self.cursor.execute("UPDATE settings SET student_book_time = {} WHERE number = 1".format(student_book_time))
+        self.mydb.commit()
+
     def get_all_books(self):
         # show all books from database
         self.cursor.execute("SELECT * FROM books")
