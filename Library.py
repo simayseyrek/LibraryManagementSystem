@@ -81,20 +81,20 @@ class Library:
             self.cursor.execute(sql)
             user = self.cursor.fetchall()
             if len(user) == 0:
-                return False
+                return False, 0
         else:
             sql = "SELECT * FROM users WHERE email = '{}'".format(input)
             self.cursor.execute(sql)
             user = self.cursor.fetchall()
             if len(user) == 0:
-                return False
+                return False, 0
 
         # check password
         actual_password = user[0][3]
         verify_password = self.hash_password(password)
         if actual_password == verify_password:
-            return True
-        return False
+            return True, user[0][0]
+        return False, 0
 
     def search_book(self, isbn=None, title=None, author=None, category=None, show_only_available=True):
         if isbn is not None:
@@ -158,6 +158,17 @@ class Library:
             return True
         return False
 
+    def check_if_admin(self, id):
+        # check if user is admin
+        sql = "SELECT * FROM users WHERE id = '{}'".format(id)
+        self.cursor.execute(sql)
+        user_level = self.cursor.fetchall()[0][4]
+
+        # check if student has a limit
+        if user_level == 3:
+            return True
+        return False
+
     def book_available_number(self, isbn):
         # return number of available number if book is available
         sql = "SELECT * FROM books WHERE isbn = '{}'".format(isbn)
@@ -165,7 +176,8 @@ class Library:
         return self.cursor.fetchall()[0][7]
 
     def checkout_book(self, id, isbn):
-        if self.book_available_number(isbn) == 0:
+        available_number = self.book_available_number(isbn)
+        if available_number == 0:
             return False
 
         if self.check_if_student(id) is True:
