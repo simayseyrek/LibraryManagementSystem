@@ -208,8 +208,12 @@ class Library:
         for checkout in checkouts:
             time_difference_seconds = time.time() - float(checkout[3])
             if time_difference_seconds > student_book_time_seconds:
-                notify_books.append(checkout)
+                notify_books.append(self.get_title_from_isbn(checkout[2]))
         return notify_books
+
+    def get_title_from_isbn(self, isbn):
+        self.cursor.execute("SELECT * FROM books WHERE isbn = {}".format(isbn))
+        return self.cursor.fetchall()[0][1]
 
     def get_all_checkouts(self):
         # show all checkouts from database (only used by admin)

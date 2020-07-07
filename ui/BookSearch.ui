@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>705</height>
+    <height>754</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -123,22 +123,32 @@
    <widget class="QPushButton" name="button_search">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>150</y>
-      <width>141</width>
-      <height>51</height>
+      <x>800</x>
+      <y>90</y>
+      <width>161</width>
+      <height>81</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>Umpush</family>
-      <pointsize>13</pointsize>
+      <pointsize>15</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
     <property name="text">
      <string>Search</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>book_searchj.png</normaloff>book_searchj.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>50</width>
+      <height>50</height>
+     </size>
     </property>
    </widget>
    <widget class="QCheckBox" name="checkbox_available">
@@ -164,22 +174,32 @@
    <widget class="QPushButton" name="button_checkout">
     <property name="geometry">
      <rect>
-      <x>800</x>
-      <y>620</y>
-      <width>141</width>
-      <height>41</height>
+      <x>650</x>
+      <y>640</y>
+      <width>191</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>Umpush</family>
-      <pointsize>13</pointsize>
+      <pointsize>15</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
     <property name="text">
      <string>Check Out</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>book_checkout.png</normaloff>book_checkout.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>50</width>
+      <height>50</height>
+     </size>
     </property>
    </widget>
    <widget class="QLineEdit" name="text_title">
@@ -297,6 +317,19 @@
       <string>available</string>
      </property>
     </column>
+   </widget>
+   <widget class="QPushButton" name="button_back">
+    <property name="geometry">
+     <rect>
+      <x>890</x>
+      <y>680</y>
+      <width>89</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>back</string>
+    </property>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
