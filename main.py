@@ -433,11 +433,8 @@ def checkin_func():
 
 def open_settings_page():
     ui_settings.setupUi(MainWindow)
-
-
-    ui_settings.text_book_limit.setText(lib.get_student_book_limit())
-    ui_settings.text_book_time.setText(lib.get_student_book_time())
-
+    ui_settings.text_book_limit.setText(str(lib.get_student_book_limit()))
+    ui_settings.text_book_time.setText(str(lib.get_student_book_time()))
     ui_settings.button_book_limit.clicked.connect(book_limit_func)
     ui_settings.button_book_time.clicked.connect(book_time_func)
     ui_settings.button_back.clicked.connect(open_main_menu)
@@ -445,7 +442,7 @@ def open_settings_page():
 
 def book_limit_func():
     book_limit = ui_settings.text_book_limit.text()
-    lib.set_student_book_limit(book_limit)
+    lib.set_student_book_limit(int(book_limit))
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Information)
     msg.setText("New Book Limit set...")
@@ -454,7 +451,7 @@ def book_limit_func():
 
 def book_time_func():
     book_time = ui_settings.text_book_time.text()
-    lib.set_student_book_time(book_time)
+    lib.set_student_book_time(int(book_time))
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Information)
     msg.setText("New Book Time set...")
